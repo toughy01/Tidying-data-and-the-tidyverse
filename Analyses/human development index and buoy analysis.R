@@ -74,7 +74,7 @@ hdi_tidy_no_na <- hdi_tidy %>%
 #"SUMMARISE" FUNCTION TO ESTABLISH THE MEAN INDEX VALUES FOR EACH COUNTRY
 hdi.summary <- hdi_tidy_no_na %>%
   group_by(country) %>%
-  summarise(mean = mean(index),
+  summarise(mean_index = mean(index),
             n = length(index),
             sd = sd(index),
             se = sd / sqrt(n))
@@ -82,5 +82,77 @@ hdi.summary <- hdi_tidy_no_na %>%
 
 
 
+#6). NOW LET'S FILTER ON THE 10 LOWEST SCORING COUNTRIES FOR HDI...
+hdi_summary_10_lowest <- hdi.summary %>%
+  filter(rank(mean_index) < 11)
+#SO WHAT WE'VE DONE HERE USING THE "FILTER" FUNCTION AND THE "RANK" FUNCTION
+#IS WE'VE SPECIFIED THAT WE ONLY WANT TO LEAVE IN THE MEAN RANKS OF THE
+#LOWEST 10 COUNTRIES (<11) = LEAVE IN ALL RANKS BELOW RANK 11 SO THE 
+#LOWEST 10 HDI SCORING COUNTRIES ON AVERAGE WITH THE PROVIDED DATA...
+#WE'VE NAMED THIS OBJECT DATAFRAME "hdi_summary_10_lowest"
 
+
+
+
+
+#7). NOW LET'S DO THE SAME WITH THE TOP 10 HIGHEST SCORING COUNTRIES
+#ON THE HDI SCALE...
+hdi_summary_10_highest <- hdi.summary %>%
+  filter(rank(mean_index) > 194)
+#SO WE HAVE FILTERED IN ONLY THE RANKS OF THE MEAN THAT ARE ABOVE THE 
+#MEAN THAT RANKS 11TH HIGHEST...
+
+
+
+
+
+
+
+
+
+#8). LET'S DO A PLOT OF THE MEAN HDI SCORES THE TOP 10 HIGHEST SCORING
+#    AND THE TOP 10 LOWEST SCORING COUNTRIES...
+
+
+#TOP 10 LOWEST SCORING HDI COUNTRIES...
+ggplot()+
+  geom_point(data = hdi_summary_10_lowest, aes(x = country, y = mean_index))+
+  geom_errorbar(data = hdi_summary_10_lowest, aes(x = country, ymin = mean_index - se,
+                                                  ymax = mean_index + se))+
+  scale_y_continuous(limits = c(0, 0.5),
+                     expand = c(0, 0),
+                     name = "HDI") +
+  scale_x_discrete(expand = c(0, 0),
+                   name = "")+
+  theme_classic()+
+  coord_flip()
+
+
+
+
+
+
+
+
+#TOP 10 HIGHEST HDI SCORING COUNTRIES...
+ggplot()+
+  geom_point(data = hdi_summary_10_highest, aes(x = country, y = mean_index))+
+  geom_errorbar(data = hdi_summary_10_highest, aes(x = country, 
+                                                   ymin = mean_index - se,
+                                                   ymax = mean_index + se))+
+  scale_y_continuous(limits = c(0.8, 1),
+                     expand = c(0, 0),
+                     name = "HDI")+
+  scale_x_discrete(expand = c(0, 0),
+                   name = "")+
+  theme_classic()+
+  coord_flip()
+                    
+
+
+
+
+
+#LET'S TRY AND BUILD A PIPELINE THAT TAKES ALL OF THE ABOVE DATA TIDYING,
+#SUMMARY STATS AND PLOT IN ONE PIPELINE...
 
